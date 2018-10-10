@@ -1,5 +1,8 @@
 package com.jamsubzero.services;
 
+/**
+ * @author jam
+ */
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -28,7 +31,18 @@ public class WeatherLogService {
 		return weatherLog.isPresent();
 	}
 	
+	public Long numberOfRecords(String location) {
+		return weatherRepository.countByLocation(location);
+	}
 	
+	public WeatherLog findOldestRecord(String location) {
+		return weatherRepository.findFirstByLocationOrderByIdAsc(location).get();
+	}
+	
+	public void deleteOldestRecord(String location) {
+	    weatherRepository.delete(weatherRepository.findFirstByLocationOrderByIdAsc(location).get());
+	
+	}
 	
 	
 	

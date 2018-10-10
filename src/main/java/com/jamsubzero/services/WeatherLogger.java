@@ -1,5 +1,9 @@
 package com.jamsubzero.services;
 
+/**
+ * @author jam
+ */
+
 import java.util.UUID;
 
 import org.jboss.logging.Logger;
@@ -21,9 +25,9 @@ public class WeatherLogger {
 	@Autowired
 	WeatherLogService weatherService;
 	
-	//private final int NUMBER_OF_LOGS = 5;
+	private final int MAX_NUMBER_OF_LOGS = 5;
 	private final int NUMBER_OF_CITIES = 3;
-	private final String SERVICE_ONE_URI = "http://localhost:8080/weather"; // the first service, granting both services are in the same machine
+	private final String SERVICE_ONE_URI = "http://localhost:8080/weather"; // address of the first service, granting both services are in the same machine
 	Logger logger = Logger.getLogger(WeatherLogger.class);
 	
 	
@@ -31,7 +35,7 @@ public class WeatherLogger {
 	while(true){	
 		String responseID = UUID.randomUUID().toString();
 		
-	    for(int index = 0; index < NUMBER_OF_CITIES; index++) {// because there are three cities
+	for(int index = 0; index < NUMBER_OF_CITIES; index++) {// because there are three cities
 	    	
 		JSONObject jsonWeather = getResponse().getJSONObject(index);
 		
@@ -39,12 +43,15 @@ public class WeatherLogger {
 		String weath = jsonWeather.getString("weather");
 		String temp = String.valueOf(jsonWeather.getDouble("temperature"));
 		
-		if(!weatherService.isExists(loc, weath, temp)){
-		
-	  	 weatherService.insert(new WeatherLog(responseID, loc, weath, temp));
+		if(!weatherService.isExists(loc, weath, temp)){ //do not insert if the info already exists
+		   if(weatherService.numberOfRecords(loc)>=MAX_NUMBER_OF_LOGS){//remove the oldest record first
+			   logger.infof("-==>Oldest: {}", weatherService.findOldestRecord(loc).getTemperature()); //checking the oldest  record
+			   weatherService.deleteOldestRecord(loc); //now remove it
+		   }
+		   weatherService.insert(new WeatherLog(responseID, loc, weath, temp));
 		
 		}else {
-			logger.info("IT Exists!");
+			logger.info("It Exists!");
 		}
 		}
 

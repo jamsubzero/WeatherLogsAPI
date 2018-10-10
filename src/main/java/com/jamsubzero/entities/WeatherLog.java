@@ -1,5 +1,9 @@
 package com.jamsubzero.entities;
 
+/**
+ * @author jam
+ */
+
 import java.sql.Timestamp;
 
 import javax.persistence.Entity;
